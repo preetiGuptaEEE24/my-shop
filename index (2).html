@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShopEasy - Online Store</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* =====================================================
+       CSS STYLES - Controls how things LOOK
+       Format: selector { property: value; }
+       ===================================================== */
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+
+    /* --- HEADER --- */
+    header {
+      background-color: #1a1a2e;
+      color: white;
+      padding: 15px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    .logo {
+      font-size: 26px;
+      font-weight: 700;
+    }
+
+    .logo span { color: #e94560; }
+
+    .cart-btn {
+      background-color: #e94560;
+      color: white;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 25px;
+      font-size: 15px;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .cart-btn:hover { background-color: #c73652; }
+
+    /* --- HERO SECTION --- */
+    .hero {
+      background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+      color: white;
+      text-align: center;
+      padding: 80px 20px;
+    }
+
+    .hero h1 { font-size: 48px; margin-bottom: 15px; }
+    .hero h1 span { color: #e94560; }
+    .hero p { font-size: 18px; margin-bottom: 30px; opacity: 0.85; }
+
+    .hero-btn {
+      background-color: #e94560;
+      color: white;
+      border: none;
+      padding: 14px 35px;
+      border-radius: 30px;
+      font-size: 16px;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .hero-btn:hover {
+      background-color: #c73652;
+      transform: scale(1.05);
+    }
+
+    /* --- PRODUCTS SECTION --- */
+    .section-title {
+      text-align: center;
+      font-size: 30px;
+      font-weight: 700;
+      margin: 50px 0 10px;
+      color: #1a1a2e;
+    }
+
+    .section-subtitle {
+      text-align: center;
+      color: #888;
+      margin-bottom: 40px;
+      font-size: 15px;
+    }
+
+    /* Grid layout - automatically arranges cards in rows */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 25px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px 60px;
+    }
+
+    /* Individual product card */
+    .product-card {
+      background-color: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .product-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    /* Product image area (colored box instead of photo) */
+    .product-img {
+      width: 100%;
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px; /* Big emoji as product image */
+    }
+
+    .card-body { padding: 16px; }
+
+    .product-category {
+      font-size: 11px;
+      color: #e94560;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .product-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a1a2e;
+      margin-bottom: 6px;
+    }
+
+    .product-price {
+      font-size: 18px;
+      font-weight: 700;
+      color: #e94560;
+      margin-bottom: 14px;
+    }
+
+    /* "Add to Cart" button on each product */
+    .add-to-cart {
+      width: 100%;
+      background-color: #1a1a2e;
+      color: white;
+      border: none;
+      padding: 11px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .add-to-cart:hover { background-color: #e94560; }
+
+    /* --- CART SIDEBAR --- */
+    .cart-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 200;
+    }
+
+    .cart-overlay.open { display: block; }
+
+    .cart-sidebar {
+      position: fixed;
+      top: 0;
+      right: -400px; /* Hidden off screen */
+      width: 360px;
+      height: 100%;
+      background: white;
+      z-index: 300;
+      padding: 25px;
+      overflow-y: auto;
+      transition: right 0.3s ease; /* Smooth slide in */
+      box-shadow: -5px 0 20px rgba(0,0,0,0.2);
+    }
+
+    .cart-sidebar.open { right: 0; } /* Slide into view */
+
+    .cart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 15px;
+    }
+
+    .cart-header h2 { font-size: 22px; color: #1a1a2e; }
+
+    .close-cart {
+      background: none;
+      border: none;
+      font-size: 26px;
+      cursor: pointer;
+      color: #888;
+      line-height: 1;
+    }
+
+    .close-cart:hover { color: #e94560; }
+
+    .cart-item {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 18px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    /* Emoji icon in cart */
+    .cart-item-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+
+    .cart-item-info { flex: 1; }
+
+    .cart-item-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1a2e;
+      margin-bottom: 4px;
+    }
+
+    .cart-item-price {
+      font-size: 14px;
+      color: #e94560;
+      font-weight: 600;
+    }
+
+    .remove-item {
+      background: none;
+      border: none;
+      color: #ccc;
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    .remove-item:hover { color: #e94560; }
+
+    .cart-empty {
+      text-align: center;
+      color: #aaa;
+      margin-top: 60px;
+      font-size: 16px;
+    }
+
+    .cart-footer {
+      margin-top: 20px;
+      border-top: 2px solid #f0f0f0;
+      padding-top: 20px;
+    }
+
+    .cart-total {
+      display: flex;
+      justify-content: space-between;
+      font-size: 18px;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 18px;
+    }
+
+    .checkout-btn {
+      width: 100%;
+      background-color: #e94560;
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      transition: background 0.2s;
+    }
+
+    .checkout-btn:hover { background-color: #c73652; }
+
+    /* --- FOOTER --- */
+    footer {
+      background-color: #1a1a2e;
+      color: #aaa;
+      text-align: center;
+      padding: 25px;
+      font-size: 14px;
+    }
+
+    footer span { color: #e94560; }
+
+    /* --- TOAST NOTIFICATION (popup at bottom) --- */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #1a1a2e;
+      color: white;
+      padding: 12px 25px;
+      border-radius: 25px;
+      font-size: 14px;
+      display: none;
+      z-index: 999;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      display: block;
+      animation: fadeInOut 2.2s ease forwards;
+    }
+
+    @keyframes fadeInOut {
+      0%   { opacity: 0; transform: translateX(-50%) translateY(10px); }
+      15%  { opacity: 1; transform: translateX(-50%) translateY(0); }
+      75%  { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    /* Mobile styles */
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 32px; }
+      header { padding: 15px 20px; }
+      .cart-sidebar { width: 100%; right: -100%; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header>
+    <div class="logo">Shop<span>Easy</span></div>
+    <button class="cart-btn" onclick="openCart()">
+      🛒 Cart (<span id="cart-count">0</span>)
+    </button>
+  </header>
+
+  <!-- ===== HERO BANNER ===== -->
+  <section class="hero">
+    <h1>Shop the <span>Best</span> Deals</h1>
+    <p>Discover amazing products at unbeatable prices</p>
+    <button class="hero-btn" onclick="scrollToProducts()">
+      Browse Products ↓
+    </button>
+  </section>
+
+  <!-- ===== PRODUCTS SECTION ===== -->
+  <section id="products">
+    <h2 class="section-title">Our Products</h2>
+    <p class="section-subtitle">Hand-picked items just for you</p>
+
+    <!-- Product cards go here (added by JavaScript) -->
+    <div class="products-grid" id="products-grid"></div>
+  </section>
+
+  <!-- ===== CART OVERLAY (dark background) ===== -->
+  <div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
+
+  <!-- ===== CART SIDEBAR ===== -->
+  <div class="cart-sidebar" id="cart-sidebar">
+    <div class="cart-header">
+      <h2>Your Cart 🛒</h2>
+      <button class="close-cart" onclick="closeCart()">✕</button>
+    </div>
+
+    <div id="cart-items">
+      <p class="cart-empty">Your cart is empty!</p>
+    </div>
+
+    <div class="cart-footer" id="cart-footer" style="display:none">
+      <div class="cart-total">
+        <span>Total:</span>
+        <span id="cart-total">₹0</span>
+      </div>
+      <button class="checkout-btn" onclick="checkout()">Proceed to Checkout ✓</button>
+    </div>
+  </div>
+
+  <!-- ===== TOAST NOTIFICATION ===== -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <p>Made with <span>♥</span> by ShopEasy &mdash; &copy; 2025</p>
+  </footer>
+
+
+  <script>
+    // =====================================================
+    // JAVASCRIPT - Makes the page interactive
+    // =====================================================
+
+    // ----- STEP 1: Product list -----
+    // Each product has: id, name, price, category, emoji, color
+    const products = [
+      { id: 1, name: "Classic White Sneakers", price: 2499, category: "Footwear",     emoji: "👟", color: "#e8f4fd" },
+      { id: 2, name: "Wireless Earbuds",        price: 1999, category: "Electronics",  emoji: "🎧", color: "#fde8f4" },
+      { id: 3, name: "Leather Wallet",           price: 899,  category: "Accessories",  emoji: "👜", color: "#fdf4e8" },
+      { id: 4, name: "Casual Backpack",          price: 1599, category: "Bags",         emoji: "🎒", color: "#e8fdf4" },
+      { id: 5, name: "Stainless Steel Bottle",   price: 699,  category: "Lifestyle",    emoji: "🍶", color: "#f4e8fd" },
+      { id: 6, name: "Sunglasses",               price: 1299, category: "Accessories",  emoji: "🕶️", color: "#fde8e8" },
+      { id: 7, name: "Smart Watch",              price: 4999, category: "Electronics",  emoji: "⌚", color: "#e8eafd" },
+      { id: 8, name: "Yoga Mat",                 price: 999,  category: "Fitness",      emoji: "🧘", color: "#e8fde8" }
+    ];
+
+    // ----- STEP 2: Empty cart to start -----
+    let cart = [];
+
+
+    // ----- STEP 3: Display all products -----
+    function showProducts() {
+      const grid = document.getElementById('products-grid');
+      let html = '';
+
+      products.forEach(function(product) {
+        // Build an HTML card for each product
+        html += `
+          <div class="product-card">
+            <div class="product-img" style="background-color: ${product.color}">
+              ${product.emoji}
+            </div>
+            <div class="card-body">
+              <p class="product-category">${product.category}</p>
+              <h3 class="product-name">${product.name}</h3>
+              <p class="product-price">₹${product.price.toLocaleString('en-IN')}</p>
+              <button class="add-to-cart" onclick="addToCart(${product.id})">
+                + Add to Cart
+              </button>
+            </div>
+          </div>
+        `;
+      });
+
+      grid.innerHTML = html;
+    }
+
+
+    // ----- STEP 4: Add item to cart -----
+    function addToCart(productId) {
+      // Find the product with this id
+      const product = products.find(p => p.id === productId);
+
+      // Check if already in cart
+      const existing = cart.find(item => item.id === productId);
+
+      if (existing) {
+        existing.quantity += 1; // Already there, increase qty
+      } else {
+        cart.push({ ...product, quantity: 1 }); // Add new item
+      }
+
+      updateCart();
+      showToast('✓ ' + product.name + ' added to cart!');
+    }
+
+
+    // ----- STEP 5: Remove item from cart -----
+    function removeFromCart(productId) {
+      cart = cart.filter(item => item.id !== productId);
+      updateCart();
+    }
+
+
+    // ----- STEP 6: Refresh the cart display -----
+    function updateCart() {
+      // Update count in header
+      const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+      document.getElementById('cart-count').textContent = totalItems;
+
+      const cartItemsDiv = document.getElementById('cart-items');
+      const cartFooter   = document.getElementById('cart-footer');
+
+      if (cart.length === 0) {
+        cartItemsDiv.innerHTML = '<p class="cart-empty">Your cart is empty!</p>';
+        cartFooter.style.display = 'none';
+        return;
+      }
+
+      // Build cart item rows
+      let html  = '';
+      let total = 0;
+
+      cart.forEach(function(item) {
+        total += item.price * item.quantity;
+        html  += `
+          <div class="cart-item">
+            <div class="cart-item-icon" style="background-color:${item.color}">${item.emoji}</div>
+            <div class="cart-item-info">
+              <p class="cart-item-name">${item.name}</p>
+              <p class="cart-item-price">₹${item.price.toLocaleString('en-IN')} × ${item.quantity}</p>
+            </div>
+            <button class="remove-item" onclick="removeFromCart(${item.id})" title="Remove">✕</button>
+          </div>
+        `;
+      });
+
+      cartItemsDiv.innerHTML = html;
+      document.getElementById('cart-total').textContent = '₹' + total.toLocaleString('en-IN');
+      cartFooter.style.display = 'block';
+    }
+
+
+    // ----- STEP 7: Open / Close cart -----
+    function openCart() {
+      document.getElementById('cart-sidebar').classList.add('open');
+      document.getElementById('cart-overlay').classList.add('open');
+    }
+
+    function closeCart() {
+      document.getElementById('cart-sidebar').classList.remove('open');
+      document.getElementById('cart-overlay').classList.remove('open');
+    }
+
+
+    // ----- STEP 8: Scroll to products -----
+    function scrollToProducts() {
+      document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
+    }
+
+
+    // ----- STEP 9: Show toast popup -----
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast show';
+      setTimeout(function() { toast.className = 'toast'; }, 2200);
+    }
+
+
+    // ----- STEP 10: Checkout -----
+    function checkout() {
+      alert('🎉 Order placed! Thank you for shopping with ShopEasy.');
+      cart = [];
+      updateCart();
+      closeCart();
+    }
+
+
+    // ----- Run on page load -----
+    showProducts();
+
+  </script>
+
+</body>
+</html>
